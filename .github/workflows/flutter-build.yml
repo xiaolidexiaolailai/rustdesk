@@ -2110,7 +2110,7 @@ jobs:
       - name: Clone Flutter source (master)
         shell: bash
         run: |
-          rm -rf /c/flutter
+          if exist C:\flutter rmdir /s /q C:\flutter
           git clone https://github.com/flutter/flutter.git --depth 1 -b master C:\flutter
           echo "C:\flutter\bin" >> $GITHUB_PATH
       
