@@ -2114,26 +2114,42 @@ jobs:
           git clone https://github.com/flutter/flutter.git --depth 1 -b master C:\flutter
           Add-Content -Path $env:GITHUB_PATH -Value "C:\flutter\bin"
       
+      - name: Download Linaro Windows ARM64 patch
+        shell: pwsh
+        working-directory: ${{ env.FLUTTER_SRC_DIR }}
+        run: |
+          curl -L -o 0001-Build-for-Windows-ARM64.patch `
+            "https://linaro.atlassian.net/wiki/download/attachments/28745138193/0001-Build-for-Windows-ARM64.patch"
+     
       - name: Apply Linaro Windows ARM64 patch
         shell: bash
-        working-directory: C:\flutter
+        working-directory: ${{ env.FLUTTER_SRC_DIR }}
         run: |
-          curl -L -o 0001-Build-for-Windows-ARM64.patch \
-            "https://linaro.atlassian.net/wiki/download/attachments/28745138193/0001-Build-for-Windows-ARM64.patch"
           git apply --allow-empty 0001-Build-for-Windows-ARM64.patch
-      
+          # 补丁应用成功无输出即表示成功
+     
+      # ========== 3. 编译 ARM64 Flutter 工具 ==========
       - name: Compile Flutter tools for ARM64
         shell: cmd
         run: |
-          cd C:\flutter\packages\flutter_tools
-          C:\dart-sdk\bin\dart compile exe bin/flutter_tools.dart -o C:\flutter\flutter-arm64.exe
-          copy /Y C:\flutter\flutter-arm64.exe C:\flutter\bin\flutter.exe
+          cd ${{ env.FLUTTER_SRC_DIR }}\packages\flutter_tools
+          C:\dart-sdk\bin\dart compile exe bin/flutter_tools.dart -o ${{ env.FLUTTER_SRC_DIR }}\flutter-arm64.exe
+          copy /Y ${{ env.FLUTTER_SRC_DIR }}\flutter-arm64.exe ${{ env.FLUTTER_SRC_DIR }}\bin\flutter.exe
         env:
           DART_SDK_ROOT: C:\dart-sdk
-      
+     
       - name: Verify Flutter version
         shell: bash
-        run: flutter --version
+        run: |
+          ${{ env.FLUTTER_SRC_DIR }}\flutter-arm64.exe --version || true
+          # 此时可能显示 "Could not determine engine revision"，这是正常的
+          # 运行 flutter doctor 会下载引擎，但为了 CI 速度，我们可以直接使用
+     
+      # ========== 4. 运行 Flutter doctor 下载引擎 ==========
+      - name: Flutter doctor (download engine)
+        shell: bash
+        run: |
+          ${{ env.FLUTTER_SRC_DIR }}\flutter-arm64.exe doctor -v
   
       - name: Apply Windows ARM64 patches
         shell: bash
