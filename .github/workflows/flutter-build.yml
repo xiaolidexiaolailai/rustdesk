@@ -2103,7 +2103,7 @@ jobs:
       - name: Install ARM64 Dart SDK
         shell: bash
         run: |
-          curl -L -o dart-sdk.zip "https://storage.googleapis.com/dart-archive/channels/be/raw/latest/sdk/dartsdk-windows-arm64-release.zip"
+          curl -L -o dart-sdk.zip "https://storage.googleapis.com/dart-archive/channels/dev/release/3.13.0-215.0.dev/sdk/dartsdk-windows-arm64-release.zip"
           unzip -q dart-sdk.zip -d /c/
           ls -l /c/dart-sdk/bin/dart
           echo "/c/dart-sdk/bin" >> $GITHUB_PATH
@@ -2137,7 +2137,6 @@ jobs:
         shell: bash
         run: |
           cd ./flutter_src/packages/flutter_tools
-          /c/dart-sdk/bin/dart pub get
           /c/dart-sdk/bin/dart compile exe bin/flutter_tools.dart -o ../../flutter-arm64.exe
           cp ../../flutter-arm64.exe ../../bin/flutter.exe
 
