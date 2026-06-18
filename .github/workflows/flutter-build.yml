@@ -2108,11 +2108,11 @@ jobs:
           echo "/c/dart-sdk/bin" >> $GITHUB_PATH
   
       - name: Clone Flutter source (master)
-        shell: bash
+        shell: pwsh
         run: |
-          if exist C:\flutter rmdir /s /q C:\flutter
+          if (Test-Path C:\flutter) { Remove-Item -Recurse -Force C:\flutter }
           git clone https://github.com/flutter/flutter.git --depth 1 -b master C:\flutter
-          echo "C:\flutter\bin" >> $GITHUB_PATH
+          Add-Content -Path $env:GITHUB_PATH -Value "C:\flutter\bin"
       
       - name: Apply Linaro Windows ARM64 patch
         shell: bash
