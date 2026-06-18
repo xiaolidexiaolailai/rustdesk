@@ -2061,3 +2061,104 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           files: |
             flutter/build/rustdesk-${{ env.VERSION }}-${{ env.RELEASE_NAME }}.tar.gz
+
+           # ====================== Windows ARM64 ======================
+build-for-windows-arm64-flutter:
+  name: Windows ARM64 Flutter
+  runs-on: windows-11-arm
+  strategy:
+    fail-fast: false
+    matrix:
+      job:
+        - {
+            target: aarch64-pc-windows-msvc,
+            os: windows-11-arm,
+            arch: arm64,
+            vcpkg-triplet: arm64-windows,
+          }
+  env:
+    VCPKG_ROOT: C:\vcpkg
+    # 可定义其他变量
+
+  steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # 原生 ARM64 已有 Clang，可能不需要，但保留无妨
+    - name: Install LLVM and Clang
+      uses: KyleMayes/install-llvm-action@v1
+      with:
+        version: ${{ env.LLVM_VERSION }}
+
+    # 原生 ARM64 运行器自带 Dart SDK？但 Flutter 会下载，保险起见保留手动安装
+    - name: Install ARM64 Dart SDK
+      shell: bash
+      run: |
+        curl -L -o dart-sdk.zip "https://storage.flutter-io.cn/dart-archive/channels/stable/release/3.11.5/sdk/dartsdk-windows-arm64-release.zip"
+        unzip -q dart-sdk.zip -d /c/dart-sdk
+        echo "/c/dart-sdk/bin" >> $GITHUB_PATH
+
+    - name: Install Flutter
+      uses: subosito/flutter-action@v2.12.0
+      with:
+        channel: "master"
+        flutter-version: "3.22.0"
+
+    - name: Apply Windows ARM64 patches
+      shell: bash
+      run: |
+        # 修改输出路径
+        sed -i 's/build\/windows\/x64\/runner\/Release/build\/windows\/arm64\/runner\/Release/g' build.py
+        # 升级 extended_text
+        sed -i 's/extended_text: 14.0.0/extended_text: 15.0.0/g' flutter/pubspec.yaml
+        # 修复 DialogTheme / TabBarTheme
+        sed -i 's/DialogTheme(/DialogThemeData(/g' flutter/lib/common.dart
+        sed -i 's/TabBarTheme(/TabBarThemeData(/g' flutter/lib/common.dart
+
+    - name: Flutter pub get
+      run: flutter pub get
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@v1
+      with:
+        toolchain: 1.75.0
+        targets: aarch64-pc-windows-msvc
+        components: rustfmt
+
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+        vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+
+
+    - name: Generate Flutter Rust Bridge
+      shell: bash
+      run: |
+        cargo install flutter_rust_bridge_codegen cargo-expand
+        cd flutter
+        flutter_rust_bridge_codegen --rust-input ../src/ffi.rs --dart-output lib/generated_bridge.dart --rust-crate-dir .. --class-name RustDeskFFI
+
+    - name: Build RustDesk Windows ARM64
+      shell: cmd
+      run: |
+        python build.py --flutter --portable --hwcodec --vram
+
+    - name: Prepare artifacts
+      shell: bash
+      run: |
+        mkdir -p rustdesk
+        cp -r ./flutter/build/windows/arm64/runner/Release/* ./rustdesk/ || true
+
+    - name: Upload ARM64 artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: rustdesk-unsigned-windows-arm64
+        path: rustdesk
