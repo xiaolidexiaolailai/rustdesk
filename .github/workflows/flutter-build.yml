@@ -2106,6 +2106,11 @@ jobs:
           curl -L -o dart-sdk.zip "https://storage.flutter-io.cn/dart-archive/channels/stable/release/3.11.5/sdk/dartsdk-windows-arm64-release.zip"
           unzip -q dart-sdk.zip -d /c/dart-sdk
           echo "/c/dart-sdk/bin" >> $GITHUB_PATH
+      - name: Verify Dart SDK
+        shell: bash
+        run: |
+          ls -l /c/dart-sdk/bin/dart
+          /c/dart-sdk/bin/dart --version
   
       - name: Clone Flutter source (master)
         shell: bash
@@ -2130,7 +2135,7 @@ jobs:
         shell: bash
         run: |
           cd ./flutter_src/packages/flutter_tools
-          C:/dart-sdk/bin/dart compile exe bin/flutter_tools.dart -o ../../flutter-arm64.exe
+          /c/dart-sdk/bin/dart compile exe bin/flutter_tools.dart -o ../../flutter-arm64.exe
           cp ../../flutter-arm64.exe ../../bin/flutter.exe
       - name: Verify Flutter version
         shell: bash
