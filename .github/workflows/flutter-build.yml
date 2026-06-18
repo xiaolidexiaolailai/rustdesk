@@ -2104,8 +2104,10 @@ jobs:
         shell: bash
         run: |
           curl -L -o dart-sdk.zip "https://storage.flutter-io.cn/dart-archive/channels/stable/release/3.11.5/sdk/dartsdk-windows-arm64-release.zip"
-          unzip -q dart-sdk.zip -d /c/dart-sdk
+          unzip -q dart-sdk.zip -d /c/
+          ls -l /c/dart-sdk/bin/dart
           echo "/c/dart-sdk/bin" >> $GITHUB_PATH
+
       - name: Verify Dart SDK
         shell: bash
         run: |
