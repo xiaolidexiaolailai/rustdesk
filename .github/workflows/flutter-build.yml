@@ -2137,8 +2137,10 @@ jobs:
         shell: bash
         run: |
           cd ./flutter_src/packages/flutter_tools
+          /c/dart-sdk/bin/dart pub get
           /c/dart-sdk/bin/dart compile exe bin/flutter_tools.dart -o ../../flutter-arm64.exe
           cp ../../flutter-arm64.exe ../../bin/flutter.exe
+
       - name: Verify Flutter version
         shell: bash
         run: |
