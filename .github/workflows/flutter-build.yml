@@ -285,6 +285,7 @@ jobs:
 
   # The fallback for the flutter version, we use Sciter for 32bit Windows.
   build-for-windows-sciter:
+    if: false
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
     runs-on: ${{ matrix.job.os }}
     # Temporarily disable this action due to additional test is needed.
@@ -436,6 +437,7 @@ jobs:
             ./SignOutput/rustdesk-*.exe
 
   build-rustdesk-ios:
+    if: false
     if: ${{ inputs.upload-artifact }}
     name: build rustdesk ios ipa
     runs-on: ${{ matrix.job.os }}
@@ -556,6 +558,7 @@ jobs:
 
 
   build-for-macOS:
+    if: false
     name: ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.os }}
     needs: [generate-bridge]
@@ -817,6 +820,7 @@ jobs:
           files: rustdesk-${{ env.VERSION }}-unsigned.tar.gz
 
   build-rustdesk-android:
+    if: false
     needs: [generate-bridge]
     name: build rustdesk android apk ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.os }}
@@ -1109,6 +1113,7 @@ jobs:
             signed-apk/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
 
   build-rustdesk-android-universal:
+    if: false
     needs: [build-rustdesk-android]
     name: build rustdesk android universal apk
     if: ${{ inputs.upload-artifact }}
@@ -1293,6 +1298,7 @@ jobs:
             signed-apk/rustdesk-${{ env.VERSION }}-universal${{ env.suffix }}.apk
 
   build-rustdesk-linux:
+    if: false
     needs: [generate-bridge]
     name: build rustdesk linux ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.on }}
@@ -1630,6 +1636,7 @@ jobs:
             res/rustdesk-${{ env.VERSION }}*.zst
 
   build-rustdesk-linux-sciter:
+    if: false
     if: ${{ inputs.upload-artifact }}
     runs-on: ${{ matrix.job.on }}
     name: build-rustdesk-linux-sciter ${{ matrix.job.target }}
@@ -1857,6 +1864,7 @@ jobs:
           path: rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
 
   build-appimage:
+    if: false
     name: Build appimage ${{ matrix.job.target }}
     needs: [build-rustdesk-linux]
     runs-on: ubuntu-22.04
@@ -1907,6 +1915,7 @@ jobs:
             ./appimage/rustdesk-${{ env.VERSION }}-*.AppImage
 
   build-flatpak:
+    if: false
     name: Build flatpak ${{ matrix.job.target }}${{ matrix.job.suffix }}
     needs:
       - build-rustdesk-linux
@@ -2107,11 +2116,32 @@ jobs:
           unzip -q dart-sdk.zip -d /c/dart-sdk
           echo "/c/dart-sdk/bin" >> $GITHUB_PATH
   
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2.12.0
-        with:
-          channel: "master"
-          flutter-version: "3.22.0"
+      - name: Clone Flutter source (master)
+        shell: bash
+        run: |
+          git clone https://github.com/flutter/flutter.git --depth 1 -b master C:\flutter
+          echo "C:\flutter\bin" >> $GITHUB_PATH
+      
+      - name: Apply Linaro Windows ARM64 patch
+        shell: bash
+        working-directory: C:\flutter
+        run: |
+          curl -L -o 0001-Build-for-Windows-ARM64.patch \
+            "https://linaro.atlassian.net/wiki/download/attachments/28745138193/0001-Build-for-Windows-ARM64.patch"
+          git apply --allow-empty 0001-Build-for-Windows-ARM64.patch
+      
+      - name: Compile Flutter tools for ARM64
+        shell: cmd
+        run: |
+          cd C:\flutter\packages\flutter_tools
+          C:\dart-sdk\bin\dart compile exe bin/flutter_tools.dart -o C:\flutter\flutter-arm64.exe
+          copy /Y C:\flutter\flutter-arm64.exe C:\flutter\bin\flutter.exe
+        env:
+          DART_SDK_ROOT: C:\dart-sdk
+      
+      - name: Verify Flutter version
+        shell: bash
+        run: flutter --version
   
       - name: Apply Windows ARM64 patches
         shell: bash
