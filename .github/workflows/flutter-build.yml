@@ -2131,12 +2131,10 @@ jobs:
       # ========== 3. 编译 ARM64 Flutter 工具 ==========
       - name: Compile Flutter tools for ARM64
         shell: cmd
+        working-directory: ${{ github.workspace }}\flutter_src\packages\flutter_tools
         run: |
-          cd ${{ env.FLUTTER_SRC_DIR }}\packages\flutter_tools
-          C:\dart-sdk\bin\dart compile exe bin/flutter_tools.dart -o ${{ env.FLUTTER_SRC_DIR }}\flutter-arm64.exe
-          copy /Y ${{ env.FLUTTER_SRC_DIR }}\flutter-arm64.exe ${{ env.FLUTTER_SRC_DIR }}\bin\flutter.exe
-        env:
-          DART_SDK_ROOT: C:\dart-sdk
+          C:\dart-sdk\bin\dart compile exe bin/flutter_tools.dart -o ${{ github.workspace }}\flutter_src\flutter-arm64.exe
+          copy /Y ${{ github.workspace }}\flutter_src\flutter-arm64.exe ${{ github.workspace }}\flutter_src\bin\flutter.exe
      
       - name: Verify Flutter version
         shell: bash
