@@ -2108,34 +2108,30 @@ jobs:
           echo "/c/dart-sdk/bin" >> $GITHUB_PATH
   
       - name: Clone Flutter source (master)
-        shell: pwsh
+        shell: bash
         run: |
-          if (Test-Path C:\flutter) { Remove-Item -Recurse -Force C:\flutter }
-          git clone https://github.com/flutter/flutter.git --depth 1 -b master C:\flutter
-          Add-Content -Path $env:GITHUB_PATH -Value "C:\flutter\bin"
+          rm -rf ./flutter_src
+          git clone https://github.com/flutter/flutter.git --depth 1 -b master ./flutter_src
+          echo "$PWD/flutter_src/bin" >> $GITHUB_PATH
       
       - name: Download Linaro Windows ARM64 patch
-        shell: pwsh
-        working-directory: ${{ env.FLUTTER_SRC_DIR }}
+        shell: bash
         run: |
-          curl -L -o 0001-Build-for-Windows-ARM64.patch `
+          curl -L -o ./flutter_src/0001-Build-for-Windows-ARM64.patch \
             "https://linaro.atlassian.net/wiki/download/attachments/28745138193/0001-Build-for-Windows-ARM64.patch"
-     
+      
       - name: Apply Linaro Windows ARM64 patch
         shell: bash
-        working-directory: ${{ env.FLUTTER_SRC_DIR }}
+        working-directory: ./flutter_src
         run: |
           git apply --allow-empty 0001-Build-for-Windows-ARM64.patch
-          # 补丁应用成功无输出即表示成功
-     
-      # ========== 3. 编译 ARM64 Flutter 工具 ==========
+      
       - name: Compile Flutter tools for ARM64
-        shell: cmd
-        working-directory: ${{ github.workspace }}\flutter_src\packages\flutter_tools
+        shell: bash
         run: |
-          C:\dart-sdk\bin\dart compile exe bin/flutter_tools.dart -o ${{ github.workspace }}\flutter_src\flutter-arm64.exe
-          copy /Y ${{ github.workspace }}\flutter_src\flutter-arm64.exe ${{ github.workspace }}\flutter_src\bin\flutter.exe
-     
+          cd ./flutter_src/packages/flutter_tools
+          C:/dart-sdk/bin/dart compile exe bin/flutter_tools.dart -o ../../flutter-arm64.exe
+          cp ../../flutter-arm64.exe ../../bin/flutter.exe
       - name: Verify Flutter version
         shell: bash
         run: |
