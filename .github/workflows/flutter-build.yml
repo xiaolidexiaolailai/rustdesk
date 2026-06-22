@@ -2099,10 +2099,15 @@ jobs:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
           vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
       
+      - name: Integrate vcpkg with MSVC
+        shell: bash
+        run: |
+          $VCPKG_ROOT/vcpkg integrate install
+      
       - name: Install vcpkg dependencies
         shell: bash
         run: |
-          $VCPKG_ROOT/vcpkg install --triplet ${{ matrix.job.vcpkg-triplet }} --x-install-root="$VCPKG_ROOT/installed"
+          $VCPKG_ROOT/vcpkg install --triplet ${{ matrix.job.vcpkg-triplet }}
       
       - name: Verify vcpkg installed libraries
         shell: bash
