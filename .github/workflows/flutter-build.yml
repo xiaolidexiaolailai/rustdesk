@@ -2180,13 +2180,11 @@ jobs:
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
           vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
-
+      
       - name: Install vcpkg dependencies
         shell: bash
         run: |
-          $VCPKG_ROOT/vcpkg install opus --triplet ${{ matrix.job.vcpkg-triplet }}
-          $VCPKG_ROOT/vcpkg install libsodium --triplet ${{ matrix.job.vcpkg-triplet }}
-          $VCPKG_ROOT/vcpkg install openssl --triplet ${{ matrix.job.vcpkg-triplet }}
+          $VCPKG_ROOT/vcpkg install --triplet ${{ matrix.job.vcpkg-triplet }}
   
   
       - name: Generate Flutter Rust Bridge
