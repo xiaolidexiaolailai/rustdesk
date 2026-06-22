@@ -9,6 +9,14 @@
       "host": false
     },
     {
+      "name": "libsodium",
+      "host": true
+    },
+    {
+      "name": "libsodium",
+      "host": false
+    },
+    {
       "name": "cpu-features",
       "platform": "android"
     },
