@@ -2118,8 +2118,10 @@ jobs:
         shell: bash
         run: |
           rm -rf ./flutter_src
-          git clone https://github.com/flutter/flutter.git --depth 1 -b master ./flutter_src
-          echo "$PWD/flutter_src/bin" >> $GITHUB_PATH
+          git clone https://github.com/flutter/flutter.git ./flutter_src
+          cd ./flutter_src
+          git checkout master
+          echo "$PWD/bin" >> $GITHUB_PATH
       
       - name: Download Linaro Windows ARM64 patch
         shell: bash
@@ -2145,6 +2147,7 @@ jobs:
         run: |
           export FLUTTER_ROOT="$PWD/flutter_src"
           mkdir -p "$FLUTTER_ROOT/bin/cache"
+          "$FLUTTER_ROOT/bin/flutter" --version  # 首次运行会生成版本信息
           echo "$FLUTTER_ROOT/bin" >> $GITHUB_PATH
           echo "FLUTTER_ROOT=$FLUTTER_ROOT" >> $GITHUB_ENV
   
