@@ -2094,9 +2094,9 @@ jobs:
           python-version: '3.11'
   
       # 原生 ARM64 已有 Clang，可能不需要，但保留无妨
-      - name: Install LLVM and Clang
-        uses: KyleMayes/install-llvm-action@v1
-        with:
+     # - name: Install LLVM and Clang
+     #   uses: KyleMayes/install-llvm-action@v1
+     #   with:
           version: ${{ env.LLVM_VERSION }}
   
       # 原生 ARM64 运行器自带 Dart SDK？但 Flutter 会下载，保险起见保留手动安装
@@ -2187,6 +2187,8 @@ jobs:
         run: |
           export PATH="$PWD/flutter_src/bin:$PATH"
           export FLUTTER_ROOT="$PWD/flutter_src"
+          # 设置 libclang 路径（Visual Studio 的 ARM64 Clang）
+          export LIBCLANG_PATH="C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/Llvm/ARM64/bin"
           cargo install flutter_rust_bridge_codegen --version 1.80.1
           cd flutter
           flutter_rust_bridge_codegen --rust-input ../src/flutter_ffi.rs --dart-output lib/generated_bridge.dart
