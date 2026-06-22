@@ -2185,9 +2185,9 @@ jobs:
       - name: Generate Flutter Rust Bridge
         shell: bash
         run: |
-          cargo install flutter_rust_bridge_codegen cargo-expand
+          cargo install flutter_rust_bridge_codegen
           cd flutter
-          flutter_rust_bridge_codegen --rust-input ../src/ffi.rs --dart-output lib/generated_bridge.dart --rust-crate-dir .. --class-name RustDeskFFI
+          flutter_rust_bridge_codegen --rust-input ../src/flutter_ffi.rs --dart-output ./flutter/lib/generated_bridge.dart
   
       - name: Build RustDesk Windows ARM64
         shell: cmd
