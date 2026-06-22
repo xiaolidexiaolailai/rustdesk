@@ -2093,11 +2093,31 @@ jobs:
         with:
           python-version: '3.11'
   
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+      
+      - name: Install vcpkg dependencies
+        shell: bash
+        run: |
+          $VCPKG_ROOT/vcpkg install --triplet ${{ matrix.job.vcpkg-triplet }}
+      
+      - name: Verify vcpkg installed libraries
+        shell: bash
+        run: |
+          echo "VCPKG_ROOT: $VCPKG_ROOT"
+          echo "Listing contents of installed directory:"
+          ls -l $VCPKG_ROOT/installed/
+          echo "Searching for arm64-related directories:"
+          ls -l $VCPKG_ROOT/installed/ | grep -i arm64 || echo "No arm64 directories found"
+  
       # 原生 ARM64 已有 Clang，可能不需要，但保留无妨
      # - name: Install LLVM and Clang
      #   uses: KyleMayes/install-llvm-action@v1
      #   with:
-          version: ${{ env.LLVM_VERSION }}
+     #    version: ${{ env.LLVM_VERSION }}
   
       # 原生 ARM64 运行器自带 Dart SDK？但 Flutter 会下载，保险起见保留手动安装
       - name: Install ARM64 Dart SDK
@@ -2174,27 +2194,6 @@ jobs:
           toolchain: 1.93.0
           targets: aarch64-pc-windows-msvc
           components: rustfmt
-  
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgDirectory: ${{ env.VCPKG_ROOT }}
-          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
-      
-      - name: Install vcpkg dependencies
-        shell: bash
-        run: |
-          $VCPKG_ROOT/vcpkg install --triplet ${{ matrix.job.vcpkg-triplet }}
-      
-      - name: Verify vcpkg installed libraries
-        shell: bash
-        run: |
-          echo "Listing installed ARM64 libraries..."
-          ls -l $VCPKG_ROOT/installed/${{ matrix.job.vcpkg-triplet }}/include/
-          ls -l $VCPKG_ROOT/installed/${{ matrix.job.vcpkg-triplet }}/lib/
-          # 特别检查关键库
-          test -d $VCPKG_ROOT/installed/${{ matrix.job.vcpkg-triplet }}/include/opus && echo "opus found" || echo "opus NOT found"
-          test -d $VCPKG_ROOT/installed/${{ matrix.job.vcpkg-triplet }}/include/sodium && echo "libsodium found" || echo "libsodium NOT found"
   
   
       - name: Generate Flutter Rust Bridge
