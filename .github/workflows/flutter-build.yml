@@ -2185,6 +2185,8 @@ jobs:
       - name: Generate Flutter Rust Bridge
         shell: bash
         run: |
+          export PATH="$PWD/flutter_src/bin:$PATH"
+          export FLUTTER_ROOT="$PWD/flutter_src"
           cargo install flutter_rust_bridge_codegen --version 1.80.1
           cd flutter
           flutter_rust_bridge_codegen --rust-input ../src/flutter_ffi.rs --dart-output lib/generated_bridge.dart
