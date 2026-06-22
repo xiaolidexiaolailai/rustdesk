@@ -2185,6 +2185,16 @@ jobs:
         shell: bash
         run: |
           $VCPKG_ROOT/vcpkg install --triplet ${{ matrix.job.vcpkg-triplet }}
+      
+      - name: Verify vcpkg installed libraries
+        shell: bash
+        run: |
+          echo "Listing installed ARM64 libraries..."
+          ls -l $VCPKG_ROOT/installed/${{ matrix.job.vcpkg-triplet }}/include/
+          ls -l $VCPKG_ROOT/installed/${{ matrix.job.vcpkg-triplet }}/lib/
+          # 特别检查关键库
+          test -d $VCPKG_ROOT/installed/${{ matrix.job.vcpkg-triplet }}/include/opus && echo "opus found" || echo "opus NOT found"
+          test -d $VCPKG_ROOT/installed/${{ matrix.job.vcpkg-triplet }}/include/sodium && echo "libsodium found" || echo "libsodium NOT found"
   
   
       - name: Generate Flutter Rust Bridge
