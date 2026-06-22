@@ -2201,6 +2201,12 @@ jobs:
       - name: Build RustDesk Windows ARM64
         shell: cmd
         run: |
+          export PATH="${{ env.FLUTTER_ROOT }}/bin:$PATH"
+          export VCPKG_ROOT="${{ env.VCPKG_ROOT }}"
+          export VCPKG_TARGET_TRIPLET="${{ matrix.job.vcpkg-triplet }}"
+          export SODIUM_LIB_DIR="$VCPKG_ROOT/installed/$VCPKG_TARGET_TRIPLET/lib"
+          export SODIUM_INCLUDE_DIR="$VCPKG_ROOT/installed/$VCPKG_TARGET_TRIPLET/include"
+          export RUSTFLAGS="-L $SODIUM_LIB_DIR"
           python build.py --flutter --portable
   
       - name: Prepare artifacts
