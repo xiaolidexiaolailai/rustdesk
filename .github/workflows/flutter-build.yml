@@ -2140,19 +2140,15 @@ jobs:
           /c/dart-sdk/bin/dart compile exe bin/flutter_tools.dart -o ../../flutter-arm64.exe
           cp ../../flutter-arm64.exe ../../bin/flutter.exe
       
-      - name: Verify Flutter version
-        shell: bash
-        run: |
-          ./flutter_src/flutter-arm64.exe --version || true
-      
       - name: Setup Flutter environment
         shell: bash
         run: |
-          mkdir -p ./flutter_src/bin/cache
-          ./flutter_src/flutter-arm64.exe doctor -v
-          ./flutter_src/flutter-arm64.exe --version
-          echo "$PWD/flutter_src/bin" >> $GITHUB_PATH
-          echo "FLUTTER_ROOT=$PWD/flutter_src" >> $GITHUB_ENV
+          export FLUTTER_ROOT="$PWD/flutter_src"
+          mkdir -p "$FLUTTER_ROOT/bin/cache"
+          "$FLUTTER_ROOT/flutter-arm64.exe" doctor -v
+          "$FLUTTER_ROOT/flutter-arm64.exe" --version
+          echo "$FLUTTER_ROOT/bin" >> $GITHUB_PATH
+          echo "FLUTTER_ROOT=$FLUTTER_ROOT" >> $GITHUB_ENV
   
       - name: Apply Windows ARM64 patches
         shell: bash
