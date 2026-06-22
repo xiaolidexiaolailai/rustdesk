@@ -2145,8 +2145,6 @@ jobs:
         run: |
           export FLUTTER_ROOT="$PWD/flutter_src"
           mkdir -p "$FLUTTER_ROOT/bin/cache"
-          "$FLUTTER_ROOT/flutter-arm64.exe" doctor -v
-          "$FLUTTER_ROOT/flutter-arm64.exe" --version
           echo "$FLUTTER_ROOT/bin" >> $GITHUB_PATH
           echo "FLUTTER_ROOT=$FLUTTER_ROOT" >> $GITHUB_ENV
   
