@@ -2187,7 +2187,7 @@ jobs:
         run: |
           cargo install flutter_rust_bridge_codegen
           cd flutter
-          flutter_rust_bridge_codegen --rust-input ../src/flutter_ffi.rs --dart-output ./flutter/lib/generated_bridge.dart
+          flutter_rust_bridge_codegen generate --rust-input ../src/flutter_ffi.rs --dart-output lib/generated_bridge.dart
   
       - name: Build RustDesk Windows ARM64
         shell: cmd
