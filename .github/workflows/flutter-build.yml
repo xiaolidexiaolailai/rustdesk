@@ -2139,19 +2139,16 @@ jobs:
           cd ./flutter_src/packages/flutter_tools
           /c/dart-sdk/bin/dart compile exe bin/flutter_tools.dart -o ../../flutter-arm64.exe
           cp ../../flutter-arm64.exe ../../bin/flutter.exe
-
+      
       - name: Verify Flutter version
         shell: bash
         run: |
-          ${{ env.FLUTTER_SRC_DIR }}\flutter-arm64.exe --version || true
-          # 此时可能显示 "Could not determine engine revision"，这是正常的
-          # 运行 flutter doctor 会下载引擎，但为了 CI 速度，我们可以直接使用
-     
-      # ========== 4. 运行 Flutter doctor 下载引擎 ==========
-      - name: Flutter doctor (download engine)
+          ./flutter_src/flutter-arm64.exe --version || true
+      
+      - name: Download Flutter engine via doctor
         shell: bash
         run: |
-          ${{ env.FLUTTER_SRC_DIR }}\flutter-arm64.exe doctor -v
+          ./flutter_src/flutter-arm64.exe doctor -v
   
       - name: Apply Windows ARM64 patches
         shell: bash
