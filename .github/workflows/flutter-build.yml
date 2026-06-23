@@ -2212,24 +2212,20 @@ jobs:
           cargo install flutter_rust_bridge_codegen --version 1.80.1
           cd flutter
           flutter_rust_bridge_codegen --rust-input ../src/flutter_ffi.rs --dart-output lib/generated_bridge.dart
+
+      - name: Patch build.rs for ARM64 triplet
+        shell: bash
+        run: |
+          echo ">>> Patching scrap/build.rs: replace x64-windows-static with arm64-windows-static for ARM64"
+          # 直接替换，不修改 bindgen 部分
+          sed -i 's/"x64-windows-static"\.to_owned()/(if target_arch == "arm64" { "arm64-windows-static" } else { "x64-windows-static" }).to_owned()/' libs/scrap/build.rs
   
       - name: Build RustDesk Windows ARM64
         shell: bash
         run: |
           export PATH="${{ env.FLUTTER_ROOT }}/bin:$PATH"
           export VCPKG_ROOT="${{ env.VCPKG_ROOT }}"
-          export VCPKG_TARGET_TRIPLET="arm64-windows"
-          export VCPKG_DEFAULT_TRIPLET="arm64-windows"
           export CARGO_BUILD_TARGET="aarch64-pc-windows-msvc"
-          export RUSTFLAGS="-L $VCPKG_ROOT/installed/arm64-windows/lib -C link-args=-LIBPATH:$VCPKG_ROOT/installed/arm64-windows/lib"
-          export PKG_CONFIG_PATH="$VCPKG_ROOT/installed/arm64-windows/lib/pkgconfig"
-          export OPUS_INCLUDE_DIR="$VCPKG_ROOT/installed/arm64-windows/include"
-          export OPUS_LIB_DIR="$VCPKG_ROOT/installed/arm64-windows/lib"
-          export SODIUM_INCLUDE_DIR="$VCPKG_ROOT/installed/arm64-windows/include"
-          export SODIUM_LIB_DIR="$VCPKG_ROOT/installed/arm64-windows/lib"
-          # 确保 pkg-config 能找到正确的 .pc 文件
-          export PKG_CONFIG_ALLOW_CROSS=1
-          # 运行构建
           python build.py --flutter --portable
   
       - name: Prepare artifacts
