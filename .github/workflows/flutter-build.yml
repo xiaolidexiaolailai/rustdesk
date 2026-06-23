@@ -2303,6 +2303,7 @@ jobs:
         run: |
           export PATH="${{ env.FLUTTER_ROOT }}/bin:$PATH"
           export VCPKG_ROOT="${{ env.VCPKG_ROOT }}"
+          export VCPKG_TARGET_TRIPLET="arm64-windows-static"
           export CARGO_BUILD_TARGET="aarch64-pc-windows-msvc"
           python build.py --flutter --portable
   
