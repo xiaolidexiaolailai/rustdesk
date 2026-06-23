@@ -2078,9 +2078,6 @@ jobs:
               arch: arm64,
               vcpkg-triplet: arm64-windows,
             }
-    env:
-      VCPKG_ROOT: C:\vcpkg
-      # 可定义其他变量
   
     steps:
       - name: Checkout source code
@@ -2283,6 +2280,23 @@ jobs:
           
           echo ">>> Redirecting magnum-opus dependency to local path"
           sed -i 's|magnum-opus = { git = "https://github.com/rustdesk-org/magnum-opus", rev = "5cd2bf98".*|magnum-opus = { path = "./libs/magnum-opus" }|' Cargo.toml
+
+      - name: Print tool versions and architecture
+        shell: bash
+        run: |
+          echo "=== Rust ==="
+          rustc --version --verbose
+          echo "=== Dart ==="
+          /c/dart-sdk/bin/dart --version
+          echo "=== Flutter ==="
+          ${{ env.FLUTTER_ROOT }}/bin/flutter --version
+          echo "=== LLVM/Clang ==="
+          clang --version || echo "clang not in PATH"
+          cmd /c "where clang" || echo "clang not found"
+          echo "=== Visual Studio link.exe ==="
+          cmd /c "where link" || echo "link not found"
+          echo "=== Environment PATH ==="
+          echo $PATH
   
       - name: Build RustDesk Windows ARM64
         shell: bash
