@@ -2216,9 +2216,14 @@ jobs:
       - name: Patch build.rs for ARM64 triplet
         shell: bash
         run: |
-          echo ">>> Patching scrap/build.rs: replace x64-windows-static with arm64-windows-static for ARM64"
-          # 直接替换，不修改 bindgen 部分
-          sed -i 's/"x64-windows-static"\.to_owned()/(if target_arch == "arm64" { "arm64-windows-static" } else { "x64-windows-static" }).to_owned()/' libs/scrap/build.rs
+          echo ">>> Cloning magnum-opus to local and patching triplet"
+          git clone --depth 1 https://github.com/rustdesk-org/magnum-opus libs/magnum-opus
+          cd libs/magnum-opus
+          sed -i 's/"x64-windows-static"\.to_owned()/(if target_arch == "arm64" { "arm64-windows-static" } else { "x64-windows-static" }).to_owned()/' build.rs
+          cd ../..
+          
+          echo ">>> Redirecting magnum-opus dependency to local path"
+          sed -i 's|magnum-opus = { git = "https://github.com/rustdesk-org/magnum-opus", rev = "5cd2bf98".*|magnum-opus = { path = "./libs/magnum-opus" }|' Cargo.toml
   
       - name: Build RustDesk Windows ARM64
         shell: bash
