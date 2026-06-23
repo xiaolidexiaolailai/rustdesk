@@ -2107,7 +2107,9 @@ jobs:
       - name: Install vcpkg dependencies
         shell: bash
         run: |
-          $VCPKG_ROOT/vcpkg install --triplet ${{ matrix.job.vcpkg-triplet }} --x-install-root="$VCPKG_ROOT/installed"
+          # 安装 arm64-windows 和 arm64-windows-static 两个 triplet
+          $VCPKG_ROOT/vcpkg install --triplet arm64-windows --x-install-root="$VCPKG_ROOT/installed"
+          $VCPKG_ROOT/vcpkg install --triplet arm64-windows-static --x-install-root="$VCPKG_ROOT/installed"
       
       - name: Verify vcpkg installed libraries
         shell: bash
