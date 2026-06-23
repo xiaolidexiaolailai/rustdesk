@@ -2103,6 +2103,10 @@ jobs:
         shell: bash
         run: |
           $VCPKG_ROOT/vcpkg integrate install
+      - name: Patch vcpkg.json to exclude ffmpeg on arm64-windows
+        shell: bash
+        run: |
+          sed -i '/"name": "ffmpeg"/,+6d' vcpkg.json
       
       - name: Install vcpkg dependencies
         shell: bash
