@@ -2269,18 +2269,7 @@ jobs:
           cd flutter
           flutter_rust_bridge_codegen --rust-input ../src/flutter_ffi.rs --dart-output lib/generated_bridge.dart
 
-      - name: Patch build.rs for ARM64 triplet
-        shell: bash
-        run: |
-          echo ">>> Cloning magnum-opus to local and patching triplet"
-          git clone --depth 1 https://github.com/rustdesk-org/magnum-opus libs/magnum-opus
-          cd libs/magnum-opus
-          sed -i 's/"x64-windows-static"\.to_owned()/(if target_arch == "arm64" { "arm64-windows-static" } else { "x64-windows-static" }).to_owned()/' build.rs
-          cd ../..
-          
-          echo ">>> Redirecting magnum-opus dependency to local path"
-          sed -i 's|magnum-opus = { git = "https://github.com/rustdesk-org/magnum-opus", rev = "5cd2bf98".*|magnum-opus = { path = "./libs/magnum-opus" }|' Cargo.toml
-
+    
       - name: Print tool versions and architecture
         shell: bash
         run: |
@@ -2303,7 +2292,9 @@ jobs:
         run: |
           export PATH="${{ env.FLUTTER_ROOT }}/bin:$PATH"
           export VCPKG_ROOT="${{ env.VCPKG_ROOT }}"
+          export VCPKGRS_TRIPLET="arm64-windows-static"
           export VCPKG_TARGET_TRIPLET="arm64-windows-static"
+          export VCPKG_DEFAULT_TRIPLET="arm64-windows-static"
           export CARGO_BUILD_TARGET="aarch64-pc-windows-msvc"
           python build.py --flutter --portable
   
