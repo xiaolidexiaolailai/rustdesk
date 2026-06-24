@@ -2275,10 +2275,17 @@ jobs:
       - name: Patch scrap build.rs for ARM64 triplet
         shell: bash
         run: |
-          # 恢复原始 build.rs（防止之前修改残留）
-          git checkout -- libs/scrap/build.rs
-          # 精确替换 triplet 选择（只改这一行）
-          sed -i 's/"x64-windows-static"\.to_owned()/if target_arch == "arm64" { "arm64-windows-static".to_owned() } else { "x64-windows-static".to_owned() }/' libs/scrap/build.rs
+          python3 -c "
+          import re
+          with open('libs/scrap/build.rs', 'r') as f:
+              content = f.read()
+          # 将所有 "x64-windows-static" 替换为 "arm64-windows-static"（仅影响 Windows 分支）
+          content = content.replace('"x64-windows-static"', '"arm64-windows-static"')
+          with open('libs/scrap/build.rs', 'w') as f:
+              f.write(content)
+          "
+              # 验证是否替换成功
+              grep -q "arm64-windows-static" libs/scrap/build.rs || exit 1
       
       - name: Patch magnum-opus build.rs for ARM64 triplet
         shell: bash
