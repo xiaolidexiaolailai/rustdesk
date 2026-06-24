@@ -2527,10 +2527,16 @@ jobs:
           echo ">>> Cloning magnum-opus to local and patching triplet"
           git clone --depth 1 https://github.com/rustdesk-org/magnum-opus libs/magnum-opus
           cd libs/magnum-opus
-          sed -i 's/"x64-windows-static"\.to_owned()/(if target_arch == "arm64" { "arm64-windows-static" } else { "x64-windows-static" }).to_owned()/' build.rs
+          # 简单替换所有 x64-windows-static 为 arm64-windows-static
+          sed -i 's/"x64-windows-static"/"arm64-windows-static"/g' build.rs
           cd ../..
-          echo ">>> Redirecting magnum-opus dependency to local path"
-          sed -i 's|magnum-opus = { git = "https://github.com/rustdesk-org/magnum-opus", rev = "5cd2bf98".*|magnum-opus = { path = "./libs/magnum-opus" }|' Cargo.toml
+          echo ">>> Overriding magnum-opus via [patch.crates-io]"
+          # 删除可能存在的旧 patch 条目
+          sed -i '/\[patch\.crates-io\]/,/^$/d' Cargo.toml
+          echo '[patch.crates-io]' >> Cargo.toml
+          echo 'magnum-opus = { path = "./libs/magnum-opus" }' >> Cargo.toml
+          echo ">>> Forcing update of magnum-opus"
+          cargo update -p magnum-opus
   
       - name: Build RustDesk Windows ARM64
         shell: bash
