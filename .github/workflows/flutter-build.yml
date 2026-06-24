@@ -2275,8 +2275,10 @@ jobs:
       - name: Patch scrap build.rs for ARM64 triplet
         shell: bash
         run: |
-          # 只修改 link_vcpkg 中的 triplet 选择
-          sed -i 's/"windows" => "x64-windows-static"\.to_owned()/"windows" => if target_arch == "arm64" { "arm64-windows-static".to_owned() } else { "x64-windows-static".to_owned() }/' libs/scrap/build.rs
+          # 恢复原始 build.rs（防止之前修改残留）
+          git checkout -- libs/scrap/build.rs
+          # 精确替换 triplet 选择（只改这一行）
+          sed -i 's/"x64-windows-static"\.to_owned()/if target_arch == "arm64" { "arm64-windows-static".to_owned() } else { "x64-windows-static".to_owned() }/' libs/scrap/build.rs
       
       - name: Patch magnum-opus build.rs for ARM64 triplet
         shell: bash
