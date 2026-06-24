@@ -2533,7 +2533,6 @@ jobs:
           export VCPKG_DEFAULT_TRIPLET="arm64-windows-static"
           export CARGO_BUILD_TARGET="aarch64-pc-windows-msvc"
           export TARGET_ARCH="arm64"
-          export RUSTFLAGS="-L $SODIUM_LIB_DIR -C link-args=-LIBPATH:$SODIUM_LIB_DIR"
           python build.py --flutter --portable
   
       - name: Prepare artifacts
