@@ -2544,8 +2544,21 @@ jobs:
           export VCPKGRS_TRIPLET="arm64-windows-static"
           export VCPKG_TARGET_TRIPLET="arm64-windows-static"
           export VCPKG_DEFAULT_TRIPLET="arm64-windows-static"
+          export SODIUM_LIB_DIR="$VCPKG_ROOT/installed/arm64-windows/lib"
+          export SODIUM_INCLUDE_DIR="$VCPKG_ROOT/installed/arm64-windows/include"
           export TARGET_ARCH="arm64"
           export CARGO_BUILD_TARGET="aarch64-pc-windows-msvc"
+          echo "=== Checking libsodium library files ==="
+          ls -l $SODIUM_LIB_DIR/libsodium* || echo "libsodium not found in $SODIUM_LIB_DIR"
+          
+          echo "=== Checking libsodium include files ==="
+          ls -l $SODIUM_INCLUDE_DIR/sodium* || echo "sodium headers not found in $SODIUM_INCLUDE_DIR"
+          
+          echo "=== Checking vcpkg installed triplets ==="
+          ls -l $VCPKG_ROOT/installed/ || echo "installed directory not found"
+          
+          echo "=== Starting build with verbose output ==="
+          export CARGO_TERM_VERBOSE=true
           python build.py --flutter --portable
   
       - name: Prepare artifacts
