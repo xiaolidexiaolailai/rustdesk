@@ -2556,9 +2556,6 @@ jobs:
           export VCPKG_DEFAULT_TRIPLET="arm64-windows-static"
           export CARGO_BUILD_TARGET="aarch64-pc-windows-msvc"
           export TARGET_ARCH="arm64"
-          export SODIUM_LIB_DIR="$VCPKG_ROOT/installed/arm64-windows-static/lib"
-          export SODIUM_INCLUDE_DIR="$VCPKG_ROOT/installed/arm64-windows-static/include"
-          export SODIUM_STATIC=1
           export RUSTFLAGS="-L $SODIUM_LIB_DIR -C link-args=-LIBPATH:$SODIUM_LIB_DIR"
           python build.py --flutter --portable
   
