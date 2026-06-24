@@ -2158,12 +2158,14 @@ jobs:
           }
           EOF
       
-      - name: Install vcpkg dependencies
+      - name: Install vcpkg dependencies (classic mode, no ffmpeg)
         shell: bash
         run: |
           # 安装 arm64-windows 和 arm64-windows-static 两个 triplet
-          $VCPKG_ROOT/vcpkg install --triplet arm64-windows --x-install-root="$VCPKG_ROOT/installed"
-          $VCPKG_ROOT/vcpkg install --triplet arm64-windows-static --x-install-root="$VCPKG_ROOT/installed"
+          $VCPKG_ROOT/vcpkg install libsodium opus libvpx libyuv aom \
+            --triplet arm64-windows --classic --x-install-root="$VCPKG_ROOT/installed"
+          $VCPKG_ROOT/vcpkg install libsodium opus libvpx libyuv aom \
+            --triplet arm64-windows-static --classic --x-install-root="$VCPKG_ROOT/installed"
       
       - name: Verify vcpkg installed libraries
         shell: bash
@@ -2269,7 +2271,14 @@ jobs:
           cd flutter
           flutter_rust_bridge_codegen --rust-input ../src/flutter_ffi.rs --dart-output lib/generated_bridge.dart
 
-    
+      - name: Force libsodium-sys to use ARM64 static library
+        shell: bash
+        run: |
+          # 删除可能存在的旧配置
+          sed -i '/\[target\.aarch64-pc-windows-msvc\.libsodium-sys\]/,/^$/d' Cargo.toml
+          echo '[target.aarch64-pc-windows-msvc.libsodium-sys]' >> Cargo.toml
+          echo 'rustc-link-lib = ["sodium"]' >> Cargo.toml
+          echo 'rustc-link-search = ["C:/vcpkg/installed/arm64-windows-static/lib"]' >> Cargo.toml
       - name: Print tool versions and architecture
         shell: bash
         run: |
@@ -2534,6 +2543,7 @@ jobs:
               }
           }
           EOF
+      
 
   
       - name: Build RustDesk Windows ARM64
@@ -2544,21 +2554,12 @@ jobs:
           export VCPKGRS_TRIPLET="arm64-windows-static"
           export VCPKG_TARGET_TRIPLET="arm64-windows-static"
           export VCPKG_DEFAULT_TRIPLET="arm64-windows-static"
-          export SODIUM_LIB_DIR="$VCPKG_ROOT/installed/arm64-windows/lib"
-          export SODIUM_INCLUDE_DIR="$VCPKG_ROOT/installed/arm64-windows/include"
-          export TARGET_ARCH="arm64"
           export CARGO_BUILD_TARGET="aarch64-pc-windows-msvc"
-          echo "=== Checking libsodium library files ==="
-          ls -l $SODIUM_LIB_DIR/libsodium* || echo "libsodium not found in $SODIUM_LIB_DIR"
-          
-          echo "=== Checking libsodium include files ==="
-          ls -l $SODIUM_INCLUDE_DIR/sodium* || echo "sodium headers not found in $SODIUM_INCLUDE_DIR"
-          
-          echo "=== Checking vcpkg installed triplets ==="
-          ls -l $VCPKG_ROOT/installed/ || echo "installed directory not found"
-          
-          echo "=== Starting build with verbose output ==="
-          export CARGO_TERM_VERBOSE=true
+          export TARGET_ARCH="arm64"
+          export SODIUM_LIB_DIR="$VCPKG_ROOT/installed/arm64-windows-static/lib"
+          export SODIUM_INCLUDE_DIR="$VCPKG_ROOT/installed/arm64-windows-static/include"
+          export SODIUM_STATIC=1
+          export RUSTFLAGS="-L $SODIUM_LIB_DIR -C link-args=-LIBPATH:$SODIUM_LIB_DIR"
           python build.py --flutter --portable
   
       - name: Prepare artifacts
