@@ -2076,7 +2076,7 @@ jobs:
               target: aarch64-pc-windows-msvc,
               os: windows-11-arm,
               arch: arm64,
-              vcpkg-triplet: arm64-windows,
+              vcpkg-triplet: arm64-windows-static,
             }
   
     steps:
@@ -2530,6 +2530,8 @@ jobs:
           export VCPKG_ROOT="${{ env.VCPKG_ROOT }}"
           export VCPKGRS_TRIPLET="arm64-windows-static"
           export VCPKG_TARGET_TRIPLET="arm64-windows-static"
+          export SODIUM_LIB_DIR="$VCPKG_ROOT/installed/arm64-windows/lib"
+          export SODIUM_INCLUDE_DIR="$VCPKG_ROOT/installed/arm64-windows/include"
           export VCPKG_DEFAULT_TRIPLET="arm64-windows-static"
           export CARGO_BUILD_TARGET="aarch64-pc-windows-msvc"
           export TARGET_ARCH="arm64"
