@@ -2271,32 +2271,7 @@ jobs:
           cd flutter
           flutter_rust_bridge_codegen --rust-input ../src/flutter_ffi.rs --dart-output lib/generated_bridge.dart
 
-      - name: Configure Cargo target-specific rustflags for ARM64
-        shell: bash
-        run: |
-          # 删除可能存在的错误配置
-          sed -i '/\[target\.aarch64-pc-windows-msvc\.libsodium-sys\]/,/^$/d' Cargo.toml
-          # 删除可能存在的旧的 target.aarch64-pc-windows-msvc 配置
-          sed -i '/\[target\.aarch64-pc-windows-msvc\]/,/^$/d' Cargo.toml
-          # 添加正确的配置
-          echo '[target.aarch64-pc-windows-msvc]' >> Cargo.toml
-          echo 'rustflags = ["-L", "C:/vcpkg/installed/arm64-windows-static/lib", "-C", "link-args=-LIBPATH:C:/vcpkg/installed/arm64-windows-static/lib"]' >> Cargo.toml
-      - name: Print tool versions and architecture
-        shell: bash
-        run: |
-          echo "=== Rust ==="
-          rustc --version --verbose
-          echo "=== Dart ==="
-          /c/dart-sdk/bin/dart --version
-          echo "=== Flutter ==="
-          ${{ env.FLUTTER_ROOT }}/bin/flutter --version
-          echo "=== LLVM/Clang ==="
-          clang --version || echo "clang not in PATH"
-          cmd /c "where clang" || echo "clang not found"
-          echo "=== Visual Studio link.exe ==="
-          cmd /c "where link" || echo "link not found"
-          echo "=== Environment PATH ==="
-          echo $PATH
+     
       - name: Patch scrap build.rs with local ARM64-tested version
         shell: bash
         run: |
