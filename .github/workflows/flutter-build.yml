@@ -2271,14 +2271,16 @@ jobs:
           cd flutter
           flutter_rust_bridge_codegen --rust-input ../src/flutter_ffi.rs --dart-output lib/generated_bridge.dart
 
-      - name: Force libsodium-sys to use ARM64 static library
+      - name: Configure Cargo target-specific rustflags for ARM64
         shell: bash
         run: |
-          # 删除可能存在的旧配置
+          # 删除可能存在的错误配置
           sed -i '/\[target\.aarch64-pc-windows-msvc\.libsodium-sys\]/,/^$/d' Cargo.toml
-          echo '[target.aarch64-pc-windows-msvc.libsodium-sys]' >> Cargo.toml
-          echo 'rustc-link-lib = ["sodium"]' >> Cargo.toml
-          echo 'rustc-link-search = ["C:/vcpkg/installed/arm64-windows-static/lib"]' >> Cargo.toml
+          # 删除可能存在的旧的 target.aarch64-pc-windows-msvc 配置
+          sed -i '/\[target\.aarch64-pc-windows-msvc\]/,/^$/d' Cargo.toml
+          # 添加正确的配置
+          echo '[target.aarch64-pc-windows-msvc]' >> Cargo.toml
+          echo 'rustflags = ["-L", "C:/vcpkg/installed/arm64-windows-static/lib", "-C", "link-args=-LIBPATH:C:/vcpkg/installed/arm64-windows-static/lib"]' >> Cargo.toml
       - name: Print tool versions and architecture
         shell: bash
         run: |
