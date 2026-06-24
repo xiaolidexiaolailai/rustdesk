@@ -2243,6 +2243,7 @@ jobs:
           # 升级 extended_text
           sed -i 's/extended_text: 14.0.0/extended_text: 15.0.0/g' flutter/pubspec.yaml
           # 修复 DialogTheme / TabBarTheme
+          sed -i 's/google_fonts: .*/google_fonts: 8.1.0/g' flutter/pubspec.yaml
           sed -i 's/DialogTheme(/DialogThemeData(/g' flutter/lib/common.dart
           sed -i 's/TabBarTheme(/TabBarThemeData(/g' flutter/lib/common.dart
   
