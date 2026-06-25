@@ -2288,22 +2288,22 @@ jobs:
               # 验证是否替换成功
               grep -q "arm64-windows-static" libs/scrap/build.rs || exit 1
       
-      - name: Patch magnum-opus build.rs for ARM64 triplet
-        shell: bash
-        run: |
-          echo ">>> Cloning magnum-opus to local and patching triplet"
-          git clone --depth 1 https://github.com/rustdesk-org/magnum-opus libs/magnum-opus
-          cd libs/magnum-opus
-          # 简单替换所有 x64-windows-static 为 arm64-windows-static
-          sed -i 's/"x64-windows-static"/"arm64-windows-static"/g' build.rs
-          cd ../..
-          echo ">>> Overriding magnum-opus via [patch.crates-io]"
-          # 删除可能存在的旧 patch 条目
-          sed -i '/\[patch\.crates-io\]/,/^$/d' Cargo.toml
-          echo '[patch.crates-io]' >> Cargo.toml
-          echo 'magnum-opus = { path = "./libs/magnum-opus" }' >> Cargo.toml
-          echo ">>> Forcing update of magnum-opus"
-          cargo update -p magnum-opus
+      #- name: Patch magnum-opus build.rs for ARM64 triplet
+      #  shell: bash
+      #  run: |
+      #    echo ">>> Cloning magnum-opus to local and patching triplet"
+      #    git clone --depth 1 https://github.com/rustdesk-org/magnum-opus libs/magnum-opus
+      #    cd libs/magnum-opus
+      #    # 简单替换所有 x64-windows-static 为 arm64-windows-static
+      #    sed -i 's/"x64-windows-static"/"arm64-windows-static"/g' build.rs
+      #    cd ../..
+      #    echo ">>> Overriding magnum-opus via [patch.crates-io]"
+      #    # 删除可能存在的旧 patch 条目
+      #    sed -i '/\[patch\.crates-io\]/,/^$/d' Cargo.toml
+      #    echo '[patch.crates-io]' >> Cargo.toml
+      #    echo 'magnum-opus = { path = "./libs/magnum-opus" }' >> Cargo.toml
+      #    echo ">>> Forcing update of magnum-opus"
+      #    cargo update -p magnum-opus
   
       - name: Build RustDesk Windows ARM64
         shell: bash
@@ -2312,8 +2312,8 @@ jobs:
           export VCPKG_ROOT="${{ env.VCPKG_ROOT }}"
           export VCPKGRS_TRIPLET="arm64-windows-static"
           export VCPKG_TARGET_TRIPLET="arm64-windows-static"
-          export SODIUM_LIB_DIR="$VCPKG_ROOT/installed/arm64-windows/lib"
-          export SODIUM_INCLUDE_DIR="$VCPKG_ROOT/installed/arm64-windows/include"
+          export SODIUM_LIB_DIR="$VCPKG_ROOT/installed/arm64-windows-static/lib"
+          export SODIUM_INCLUDE_DIR="$VCPKG_ROOT/installed/arm64-windows-static/include"
           export VCPKG_DEFAULT_TRIPLET="arm64-windows-static"
           export TARGET_ARCH="arm64"
           python build.py --flutter --portable
@@ -2331,3 +2331,9 @@ jobs:
         with:
           name: rustdesk-unsigned-windows-arm64
           path: rustdesk
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustdesk-installer-windows-arm64
+          path: rustdesk-1.4.8-install.exe
