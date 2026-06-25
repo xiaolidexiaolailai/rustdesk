@@ -2247,7 +2247,7 @@ jobs:
           export SODIUM_INCLUDE_DIR="$VCPKG_ROOT/installed/arm64-windows-static/include"
           export VCPKG_DEFAULT_TRIPLET="arm64-windows-static"
           export TARGET_ARCH="arm64"
-          python build.py --flutter --portable
+          python build.py --flutter --hwcodec --portable
   
       - name: Prepare artifacts
         shell: bash
