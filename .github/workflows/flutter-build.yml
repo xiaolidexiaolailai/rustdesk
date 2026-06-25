@@ -2238,22 +2238,14 @@ jobs:
       - name: Apply Windows ARM64 patches
         shell: bash
         run: |
-          # 修改 Flutter 输出路径为 arm64
+          # 修改输出路径
           sed -i 's/build\/windows\/x64\/runner\/Release/build\/windows\/arm64\/runner\/Release/g' build.py
-        
-          # 升级 extended_text 到 15.0.0（兼容新版 Flutter）
-          sed -i 's/^[[:space:]]*extended_text:.*/  extended_text: 15.0.0/g' flutter/pubspec.yaml
-        
-          # 升级 google_fonts 到 8.1.0（兼容 Flutter master）
-          sed -i 's/^[[:space:]]*google_fonts:.*/  google_fonts: 8.1.0/g' flutter/pubspec.yaml
-        
-          # 修复 DialogTheme / TabBarTheme API 变更
+          # 升级 extended_text
+          sed -i 's/extended_text: 14.0.0/extended_text: 15.0.0/g' flutter/pubspec.yaml
+          # 修复 DialogTheme / TabBarTheme
+          sed -i 's/google_fonts: .*/google_fonts: 8.1.0/g' flutter/pubspec.yaml
           sed -i 's/DialogTheme(/DialogThemeData(/g' flutter/lib/common.dart
           sed -i 's/TabBarTheme(/TabBarThemeData(/g' flutter/lib/common.dart
-        
-          # 输出修改后的版本信息，便于调试
-          echo "=== pubspec.yaml after modifications ==="
-          grep -E "extended_text|google_fonts" flutter/pubspec.yaml || echo "Not found"
   
       - name: Flutter pub get
         shell: bash
@@ -2331,6 +2323,8 @@ jobs:
         run: |
           mkdir -p rustdesk
           cp -r ./flutter/build/windows/arm64/runner/Release/* ./rustdesk/ || true
+          # 同时复制安装包（如果存在）
+          cp ./rustdesk-*.exe ./rustdesk/ 2>/dev/null || true
   
       - name: Upload ARM64 artifact
         uses: actions/upload-artifact@v4
